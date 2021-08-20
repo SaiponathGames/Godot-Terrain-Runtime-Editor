@@ -33,7 +33,7 @@ func clear():
 func query(bounds: AABB):
 	return _quad_tree.query(bounds)
 
-func draw(height: float = 1, clear_drawing: bool = true, draw_outlines: bool = true, draw_tree_bounds: bool = true):
+func draw(height: float = 1, clear_drawing: bool = true, draw_outlines: bool = true, draw_tree_bounds: bool = true, _transform: Transform = Transform.IDENTITY):
 	return _quad_tree.draw(height, clear_drawing, draw_outlines, draw_tree_bounds)
 
 func set_bounds(value):

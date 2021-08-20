@@ -17,6 +17,7 @@ func _ready() -> void:
 		quadtree.add_body(spatial_vertex, _get_common_bounds(vertex))
 		if i % 100 == 0:
 			yield(get_tree(), "idle_frame")
+	print(mesh_data_tool.get_vertex_count())
 	quadtree.draw()
 	terrain_tool.show()
 

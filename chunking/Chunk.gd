@@ -18,10 +18,9 @@ func _init(p_position, p_size, p_lod_level, p_image: Image, p_image_offset):
 	image = p_image
 	
 	quad_tree = QuadTreeNode.new()
-	quad_tree.max_levels = 15
-	quad_tree.extents = Vector3(1, 0, 1) * size
+	quad_tree.max_levels = 50
+	quad_tree.extents = Vector3(1, 0, 1) * size + Vector3.UP * 2
 	quad_tree.capacity = 10
-	add_child(quad_tree)
 	
 	if range(0, 10+1).has(lod_level):
 		lod_level = p_lod_level
@@ -30,6 +29,9 @@ func _init(p_position, p_size, p_lod_level, p_image: Image, p_image_offset):
 	
 
 func generate_mesh():
+	quad_tree.immediate_geo_node_path = get_tree().get_root().find_node("ImmediateGeometry", true, false).get_path()
+	add_child(quad_tree)
+	
 	mesh = PlaneMesh.new()
 	mesh.size = Vector2(size, size)
 	
@@ -56,7 +58,8 @@ func setup_quadtree():
 		mesh_data_tool.set_vertex(i, Vector3(vertex.x, 0, vertex.z))
 		spatial_vertex.set_meta("i", i)
 		quad_tree.add_body(spatial_vertex, _get_common_bounds(vertex))
-	
+	quad_tree.draw(1, true, true, true, global_transform)
+	print(mesh_data_tool.get_vertex_count())
 
 func _get_common_bounds(vertex):
 	return AABB(Vector3(vertex.x-0.25, vertex.y, vertex.z-0.25), Vector3(0.5, 0, 0.5))
@@ -68,7 +71,7 @@ func _process_chunk(delta, terrain_tool, aabb: AABB):
 		var old_vertex = body.get_translation()
 		var i = body.get_meta("i")
 		if !terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_FLATTEN:
-			vertex.y += terrain_tool.get_strength_at_position(old_vertex, true) * ((2.0 * int(!terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_DOWN)) - 1) * delta
+			vertex.y += terrain_tool.get_strength_at_position(old_vertex, false) * ((2.0 * int(!terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_DOWN)) - 1) * delta
 		else:
 			if int(vertex.y) == 0:
 				vertex.y = lerp(vertex.y, 0, delta*5)

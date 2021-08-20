@@ -57,7 +57,7 @@ func _ready():
 	for i in range((-_size+chunk_size)/2, (_size+chunk_size)/2, chunk_size):
 		for j in range((-_size+chunk_size)/2, (_size+chunk_size)/2, chunk_size):
 			var image_offset: Vector2 = Vector2(range_lerp(i, -_size/2, _size/2, 0, _size), range_lerp(j, -_size/2, _size/2, 0, _size))
-			var chunk = Chunk.new(Vector3(i, 0, j), chunk_size, 2, height_map, image_offset)
+			var chunk = Chunk.new(Vector3(i, 0, j), chunk_size, 0, height_map, image_offset)
 			add_child(chunk)
 			chunks[Vector3(i, 0, j)] = chunk
 			chunk.translation = Vector3(i, 0, j)
@@ -98,10 +98,10 @@ func _process(delta):
 			aabb.size.y += 100
 			var queried_chunks = quad_tree.query(aabb)
 			for chunk in queried_chunks:
-#				var new_aabb = chunk.get_transformed_aabb().intersection(aabb)
-				var old_aabb = (chunk.global_transform as Transform).xform_inv(aabb)
-#				old_aabb.position.y -= 50
-#				old_aabb.size.y += 100
+				var new_aabb = aabb.intersection(chunk.get_transformed_aabb())
+				var old_aabb = (chunk.global_transform as Transform).xform_inv(new_aabb)
+				old_aabb.position.y -= 50
+				old_aabb.size.y += 100
 				(chunk as Chunk)._process_chunk(delta, terrain_tool, old_aabb)
 				
 	terrain_tool.reset_values()

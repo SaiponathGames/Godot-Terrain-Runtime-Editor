@@ -8,9 +8,7 @@
 [ext_resource path="res://CircleAttenuation.gd" type="Script" id=6]
 [ext_resource path="res://TerrainTool.gd" type="Script" id=7]
 [ext_resource path="res://addons/sairam.quadtree/AABBUtils.gd" type="Script" id=8]
-
-[sub_resource type="SpatialMaterial" id=1]
-albedo_color = Color( 0.0862745, 0.439216, 0.156863, 1 )
+[ext_resource path="res://Materials/Terrain.material" type="Material" id=9]
 
 [sub_resource type="SpatialMaterial" id=2]
 albedo_color = Color( 0, 1, 1, 1 )
@@ -39,7 +37,7 @@ script = ExtResource( 8 )
 [node name="Terrain" type="Spatial" parent="."]
 script = ExtResource( 1 )
 terrain_tool_node = NodePath("../Tools/TerrainTool")
-terrain_material = SubResource( 1 )
+terrain_material = ExtResource( 9 )
 size = 64
 
 [node name="Camera" parent="." instance=ExtResource( 2 )]
