@@ -1,0 +1,97 @@
+[gd_scene load_steps=14 format=2]
+
+[ext_resource path="res://TerrainChunked.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/Camera.tscn" type="PackedScene" id=2]
+[ext_resource path="res://FPSDebug.gd" type="Script" id=3]
+[ext_resource path="res://sounds/terraform_raise.wav" type="AudioStream" id=4]
+[ext_resource path="res://sounds/terraform_lower.wav" type="AudioStream" id=5]
+[ext_resource path="res://CircleAttenuation.gd" type="Script" id=6]
+[ext_resource path="res://TerrainTool.gd" type="Script" id=7]
+[ext_resource path="res://addons/sairam.quadtree/AABBUtils.gd" type="Script" id=8]
+
+[sub_resource type="SpatialMaterial" id=1]
+albedo_color = Color( 0.0862745, 0.439216, 0.156863, 1 )
+
+[sub_resource type="SpatialMaterial" id=2]
+albedo_color = Color( 0, 1, 1, 1 )
+
+[sub_resource type="CylinderMesh" id=3]
+material = SubResource( 2 )
+top_radius = 3.0
+bottom_radius = 3.0
+height = 0.5
+
+[sub_resource type="SpatialMaterial" id=4]
+flags_unshaded = true
+params_line_width = 24.8
+albedo_color = Color( 1, 0, 0, 1 )
+
+[sub_resource type="SpatialMaterial" id=5]
+flags_unshaded = true
+params_line_width = 24.8
+albedo_color = Color( 0, 0, 0, 1 )
+
+[node name="World" type="Spatial"]
+
+[node name="AABBUtils" type="Spatial" parent="."]
+script = ExtResource( 8 )
+
+[node name="Terrain" type="Spatial" parent="."]
+script = ExtResource( 1 )
+terrain_tool_node = NodePath("../Tools/TerrainTool")
+terrain_material = SubResource( 1 )
+size = 64
+
+[node name="Camera" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0 )
+far = 500.0
+tilting/max_angle = 90.0
+zooming/max_distance = 300.0
+
+[node name="Tools" type="Spatial" parent="."]
+
+[node name="TerrainTool" type="MeshInstance" parent="Tools"]
+mesh = SubResource( 3 )
+material/0 = null
+script = ExtResource( 7 )
+
+[node name="AttenuatedCircle" type="Spatial" parent="Tools/TerrainTool"]
+script = ExtResource( 6 )
+radius = 3.0
+attentuation_radius = 1.0
+
+[node name="Raise" type="AudioStreamPlayer" parent="Tools/TerrainTool"]
+stream = ExtResource( 4 )
+volume_db = -3.098
+
+[node name="Lower" type="AudioStreamPlayer" parent="Tools/TerrainTool"]
+stream = ExtResource( 5 )
+volume_db = -3.098
+
+[node name="ImmediateGeometry" type="ImmediateGeometry" parent="Tools"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )
+visible = false
+material_override = SubResource( 4 )
+
+[node name="ImmediateGeometry2" type="ImmediateGeometry" parent="Tools"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )
+visible = false
+material_override = SubResource( 5 )
+
+[node name="Control" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Control"]
+margin_right = 40.0
+margin_bottom = 14.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0, 0 )

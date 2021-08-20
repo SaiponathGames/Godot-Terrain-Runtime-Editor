@@ -1,0 +1,143 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://PanelContainer.gd" type="Script" id=1]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -702.0
+margin_top = -271.0
+margin_right = -55.0
+margin_bottom = -60.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 640.0
+margin_bottom = 204.0
+custom_constants/separation = 10
+
+[node name="Radius" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+margin_right = 633.0
+margin_bottom = 16.0
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/Radius"]
+margin_top = 1.0
+margin_right = 130.0
+margin_bottom = 15.0
+text = "Radius:                     "
+
+[node name="Radius" type="HSlider" parent="PanelContainer/VBoxContainer/Radius"]
+margin_left = 134.0
+margin_right = 605.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+min_value = 3.0
+max_value = 256.0
+value = 3.0
+
+[node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/Radius"]
+margin_left = 609.0
+margin_top = 1.0
+margin_right = 633.0
+margin_bottom = 15.0
+text = "000"
+
+[node name="Strength" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+margin_top = 26.0
+margin_right = 633.0
+margin_bottom = 42.0
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/Strength"]
+margin_top = 1.0
+margin_right = 129.0
+margin_bottom = 15.0
+text = "Strength:                  "
+
+[node name="Strength" type="HSlider" parent="PanelContainer/VBoxContainer/Strength"]
+margin_left = 133.0
+margin_right = 605.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+
+[node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/Strength"]
+margin_left = 609.0
+margin_top = 1.0
+margin_right = 633.0
+margin_bottom = 15.0
+text = "000"
+
+[node name="RotationDegrees" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+margin_top = 52.0
+margin_right = 633.0
+margin_bottom = 68.0
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/RotationDegrees"]
+margin_top = 1.0
+margin_right = 130.0
+margin_bottom = 15.0
+text = "Rotation Degrees:    "
+
+[node name="RotationDegrees" type="HSlider" parent="PanelContainer/VBoxContainer/RotationDegrees"]
+margin_left = 134.0
+margin_right = 605.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+max_value = 359.0
+
+[node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/RotationDegrees"]
+margin_left = 609.0
+margin_top = 1.0
+margin_right = 633.0
+margin_bottom = 15.0
+text = "000"
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+margin_top = 78.0
+margin_right = 633.0
+margin_bottom = 197.0
+size_flags_vertical = 3
+custom_constants/separation = 23
+alignment = 1
+
+[node name="Button" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer4"]
+margin_right = 195.0
+margin_bottom = 119.0
+size_flags_horizontal = 3
+text = "Slope Up"
+
+[node name="Button2" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer4"]
+margin_left = 218.0
+margin_right = 414.0
+margin_bottom = 119.0
+size_flags_horizontal = 3
+text = "Slope Down"
+
+[node name="Button3" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer4"]
+margin_left = 437.0
+margin_right = 633.0
+margin_bottom = 119.0
+size_flags_horizontal = 3
+text = "Slope Flatten"
+
+[connection signal="value_changed" from="PanelContainer/VBoxContainer/Radius/Radius" to="PanelContainer" method="_on_HSlider_value_changed"]
+[connection signal="value_changed" from="PanelContainer/VBoxContainer/Strength/Strength" to="PanelContainer" method="_on_Strength_value_changed"]
+[connection signal="value_changed" from="PanelContainer/VBoxContainer/RotationDegrees/RotationDegrees" to="PanelContainer" method="_on_RotationDegrees_value_changed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer4/Button" to="PanelContainer" method="_on_Button_pressed" binds= [ 0 ]]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer4/Button2" to="PanelContainer" method="_on_Button_pressed" binds= [ 1 ]]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer4/Button3" to="PanelContainer" method="_on_Button_pressed" binds= [ 2 ]]
