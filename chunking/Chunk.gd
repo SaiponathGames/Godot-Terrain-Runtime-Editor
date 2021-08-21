@@ -36,8 +36,8 @@ func generate_mesh():
 	mesh.size = Vector2(size, size)
 	
 	if lod_level == 0:
-		mesh.subdivide_width = size * 2
-		mesh.subdivide_depth = size * 2
+		mesh.subdivide_width = (size * 2)-1
+		mesh.subdivide_depth = (size * 2)-1
 	if lod_level == 1:
 		mesh.subdivide_width = size
 		mesh.subdivide_depth = size
@@ -47,7 +47,7 @@ func generate_mesh():
 	
 	mesh_data_tool = create_datatool_from_mesh()
 	generate_collision_mesh()
-	
+
 	setup_quadtree()
 
 func setup_quadtree():
@@ -56,6 +56,7 @@ func setup_quadtree():
 		var spatial_vertex = Spatial.new()
 		spatial_vertex.translation = vertex
 		mesh_data_tool.set_vertex(i, Vector3(vertex.x, 0, vertex.z))
+		# print("vertex ", i, ": ", vertex)
 		spatial_vertex.set_meta("i", i)
 		quad_tree.add_body(spatial_vertex, _get_common_bounds(vertex))
 	quad_tree.draw(1, true, true, true, global_transform)
@@ -65,11 +66,20 @@ func _get_common_bounds(vertex):
 	return AABB(Vector3(vertex.x-0.25, vertex.y, vertex.z-0.25), Vector3(0.5, 0, 0.5))
 
 func _process_chunk(delta, terrain_tool, aabb: AABB):
-	var bodies = quad_tree.query(aabb)
+	var vertex_size = 0.5
+	aabb.position.x = floor(aabb.position.x / vertex_size)*vertex_size
+	aabb.position.z = floor(aabb.position.z / vertex_size)*vertex_size
+	aabb.end.x = ceil(aabb.end.x / vertex_size)*vertex_size
+	aabb.end.x = ceil(aabb.end.x / vertex_size)*vertex_size
+
+	var bodies = quad_tree.query(aabb.grow(0.05))
+	# print("chunk: ", self, "aabb:", aabb, " -> ", bodies.size())
+
 	for body in bodies:
 		var vertex = body.get_translation()
 		var old_vertex = body.get_translation()
 		var i = body.get_meta("i")
+		
 		if !terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_FLATTEN:
 			vertex.y += terrain_tool.get_strength_at_position(old_vertex, false) * ((2.0 * int(!terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_DOWN)) - 1) * delta
 		else:
@@ -79,6 +89,7 @@ func _process_chunk(delta, terrain_tool, aabb: AABB):
 				vertex.y += terrain_tool.get_strength_at_position(old_vertex, false) * ((2.0 * int(vertex.y < 0)) - 1) * delta
 		vertex.y = clamp(vertex.y, -50, 100)
 		if vertex != old_vertex:
+			# print("vertex ", i, ": ", vertex, ": ", old_vertex.y, " -> ", vertex.y)
 			mesh_data_tool.set_vertex(i, vertex)
 			body.set_translation(vertex)
 			quad_tree.update_body(body, _get_common_bounds(vertex))

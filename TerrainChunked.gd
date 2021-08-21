@@ -54,8 +54,10 @@ func _ready():
 	if get_node_or_null(terrain_tool_node):
 		terrain_tool = get_node(terrain_tool_node)
 #	print(range(-_size/2-8, 64-/2+8, 16))
-	for i in range((-_size+chunk_size)/2, (_size+chunk_size)/2, chunk_size):
-		for j in range((-_size+chunk_size)/2, (_size+chunk_size)/2, chunk_size):
+	var r = range((-_size+chunk_size)/2, (_size+chunk_size)/2, chunk_size)
+	# var r = range((-2*chunk_size+chunk_size)/2, (2*chunk_size+chunk_size)/2, chunk_size)
+	for i in r:
+		for j in r:
 			var image_offset: Vector2 = Vector2(range_lerp(i, -_size/2, _size/2, 0, _size), range_lerp(j, -_size/2, _size/2, 0, _size))
 			var chunk = Chunk.new(Vector3(i, 0, j), chunk_size, 0, height_map, image_offset)
 			add_child(chunk)
@@ -96,10 +98,16 @@ func _process(delta):
 			var aabb = terrain_tool.get_transformed_aabb()
 			aabb.position.y -= 50
 			aabb.size.y += 100
-			var queried_chunks = quad_tree.query(aabb)
+
+			# print("--------: ", aabb)
+
+			var vertex_size = 0.5
+
+			var queried_chunks = quad_tree.query(aabb.grow(vertex_size))
 			for chunk in queried_chunks:
-				var new_aabb = aabb.intersection(chunk.get_transformed_aabb())
+				var new_aabb = aabb
 				var old_aabb = (chunk.global_transform as Transform).xform_inv(new_aabb)
+				# print("chunk: ", chunk, " (", chunk.get_transformed_aabb(), "), aabb: ", aabb, ", new: ", new_aabb, ", old: ", old_aabb)
 				old_aabb.position.y -= 50
 				old_aabb.size.y += 100
 				(chunk as Chunk)._process_chunk(delta, terrain_tool, old_aabb)
