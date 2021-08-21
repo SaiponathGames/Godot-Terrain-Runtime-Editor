@@ -33,6 +33,7 @@ func _unhandled_input(event):
 				radius = mesh.bottom_radius
 				attenuated_circle.radius = radius
 	if Input.is_action_just_pressed("left_button"):
+		position = translation
 		for audio in sound_dict.values():
 			audio.stop()
 		sound_dict[current_state].play()
