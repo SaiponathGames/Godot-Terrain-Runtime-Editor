@@ -3,10 +3,10 @@ class_name AttenuatedCircle
 
 export var radius: float = 32 setget set_radius
 export var attentuation_radius: float = 5 setget set_attentuation_radius
-export var attentuation_strength: float = 10 setget set_attentuation_strength
-export var attentuation_size_multiplier: float = 10 setget set_attentuation_size_multiplier
-export var max_power: float = 5
-export var min_power: float = 2
+export(float, 0, 1, 0.01) var attentuation_strength: float = 1 setget set_attentuation_strength
+export(float, 0, 20, 0.1) var attentuation_size_multiplier: float = 10 setget set_attentuation_size_multiplier
+export var max_power: float = 1
+export var min_power: float = 0
 
 onready var attentuation_size: float = _update_attentuation_size()
 onready var radius_squared = _update_radius_squared()
@@ -35,7 +35,7 @@ func _update_attentuation_radius_squared():
 	return attentuation_radius * attentuation_radius
 
 func _update_attentuation_size():
-	return attentuation_size_multiplier * attentuation_strength
+	return attentuation_strength * attentuation_size_multiplier
 
 func get_power_at_position(position: Vector3, sharp = false) -> float:
 	var _translation = global_transform.origin
@@ -56,4 +56,4 @@ func get_power_at_position(position: Vector3, sharp = false) -> float:
 			/ (radius - attentuation_radius)
 		)
 #		print(ratio)
-	return lerp(min_power, max_power, ratio)
+	return lerp(min_power, max_power, ratio) * attentuation_size

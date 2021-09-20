@@ -11,16 +11,14 @@ const QuadTreeNode = preload("res://addons/sairam.quadtree/QuadTreeNode.gd")
 var mesh_data_tool: MeshDataTool
 var quad_tree: QuadTreeNode
 var mesh_changed: bool = false
+var draw_immediate_geometry: ImmediateGeometry
+var collision_shape: CollisionShape
+var draw_quad_tree = false
 
 func _init(p_position, p_size, p_lod_level, p_image: Image, p_image_offset):
 	position = p_position
 	size = p_size
 	image = p_image
-	
-	quad_tree = QuadTreeNode.new()
-	quad_tree.max_levels = 50
-	quad_tree.extents = Vector3(1, 0, 1) * size + Vector3.UP * 2
-	quad_tree.capacity = 10
 	
 	if range(0, 10+1).has(lod_level):
 		lod_level = p_lod_level
@@ -28,10 +26,28 @@ func _init(p_position, p_size, p_lod_level, p_image: Image, p_image_offset):
 		print("Lod level too high or low.")
 	
 
-func generate_mesh():
-	quad_tree.immediate_geo_node_path = get_tree().get_root().find_node("ImmediateGeometry", true, false).get_path()
+func _ready():
+	
+	if draw_quad_tree:
+		draw_immediate_geometry = ImmediateGeometry.new()
+		draw_immediate_geometry.material_override = load("res://Materials/Drawing.material")
+		add_child(draw_immediate_geometry)
+	
+	quad_tree = QuadTreeNode.new()
+	quad_tree.max_levels = 50
+	quad_tree.extents = Vector3(1, 0, 1) * size + Vector3.UP * 2
+	quad_tree.capacity = 10
+	if draw_quad_tree:
+		quad_tree.immediate_geo_node_path = draw_immediate_geometry.get_path()
 	add_child(quad_tree)
 	
+	var static_body = StaticBody.new()
+	collision_shape = CollisionShape.new()
+	static_body.add_child(collision_shape)
+	add_child(static_body)
+	
+
+func generate_mesh():
 	mesh = PlaneMesh.new()
 	mesh.size = Vector2(size, size)
 	
@@ -59,8 +75,9 @@ func setup_quadtree():
 		# print("vertex ", i, ": ", vertex)
 		spatial_vertex.set_meta("i", i)
 		quad_tree.add_body(spatial_vertex, _get_common_bounds(vertex))
-	quad_tree.draw(1, true, true, true, global_transform)
-	print(mesh_data_tool.get_vertex_count())
+	if draw_quad_tree:
+		quad_tree.draw(1, true, true, true, global_transform)
+#	print(mesh_data_tool.get_vertex_count())
 
 func _get_common_bounds(vertex):
 	return AABB(Vector3(vertex.x-0.25, vertex.y, vertex.z-0.25), Vector3(0.5, 0, 0.5))
@@ -81,15 +98,16 @@ func _process_chunk(delta, terrain_tool, aabb: AABB):
 		var i = body.get_meta("i")
 		
 		if !terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_FLATTEN:
-			vertex.y += terrain_tool.get_strength_at_position(old_vertex, false) * ((2.0 * int(!terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_DOWN)) - 1) * delta
+			vertex.y += terrain_tool.get_strength_at_position(vertex, false) * ((2.0 * int(!terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_DOWN)) - 1) * delta
+#			print(vertex.y)
 		else:
 			if int(vertex.y) == 0:
 				vertex.y = lerp(vertex.y, 0, delta*5)
 			else:
-				vertex.y += terrain_tool.get_strength_at_position(old_vertex, false) * ((2.0 * int(vertex.y < 0)) - 1) * delta
+				vertex.y += terrain_tool.get_strength_at_position(vertex, false) * ((2.0 * int(vertex.y < 0)) - 1) * delta
 		vertex.y = clamp(vertex.y, -50, 100)
 		if vertex != old_vertex:
-			# print("vertex ", i, ": ", vertex, ": ", old_vertex.y, " -> ", vertex.y)
+#			print("vertex ", i, ": ", vertex, ": ", old_vertex.y, " -> ", vertex.y)
 			mesh_data_tool.set_vertex(i, vertex)
 			body.set_translation(vertex)
 			quad_tree.update_body(body, _get_common_bounds(vertex))
@@ -104,8 +122,8 @@ func create_mesh_from_datatool():
 # warning-ignore:return_value_discarded
 	mesh_data_tool.commit_to_surface(array_mesh)
 	mesh = array_mesh
-	if get_child_count() and get_child(1).get_child_count():
-		get_child(1).get_child(0).shape = mesh.create_trimesh_shape()
+	if collision_shape:
+		collision_shape.shape = mesh.create_trimesh_shape()
 
 
 func calculate_normals():
@@ -134,7 +152,9 @@ func calculate_normals():
 
 func generate_collision_mesh():
 	var static_body = StaticBody.new()
+	static_body.name = "StaticBody"
 	var collision_shape = CollisionShape.new()
+	collision_shape.name = "CollisionShape"
 	var shape = mesh.create_trimesh_shape()
 	collision_shape.shape = shape
 	static_body.add_child(collision_shape)

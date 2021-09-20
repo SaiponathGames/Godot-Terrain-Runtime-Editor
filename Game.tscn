@@ -67,7 +67,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.133306, 0 )
 script = ExtResource( 7 )
 radius = 3.0
 attentuation_radius = 0.01
-min_power = 0.0
+attentuation_size_multiplier = 0.5
 
 [node name="Raise" type="AudioStreamPlayer" parent="TerrainTool"]
 stream = ExtResource( 8 )
