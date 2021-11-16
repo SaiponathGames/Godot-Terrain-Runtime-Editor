@@ -2,8 +2,8 @@ shader_type spatial;
 // by Sairam
 uniform float radius = 3.0;
 uniform float attenuated_radius = 0.01;
-uniform float attenuation_strength = 1.0;
-uniform float attenuated_size_multiplier = 1.0;
+uniform float attenuation_strength : hint_range(0.0, 1.0) = 1.0;
+uniform float attenuated_size_multiplier : hint_range(0.0, 5.0) = 1.0;
 uniform float max_power = 1;
 uniform float min_power = 0;
 

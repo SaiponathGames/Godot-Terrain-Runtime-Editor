@@ -55,11 +55,11 @@ func generate_mesh():
 		mesh.subdivide_width = (size * 2)-1
 		mesh.subdivide_depth = (size * 2)-1
 	if lod_level == 1:
-		mesh.subdivide_width = size
-		mesh.subdivide_depth = size
+		mesh.subdivide_width = size-1
+		mesh.subdivide_depth = size-1
 	if lod_level > 1:
-		mesh.subdivide_width = size/lod_level
-		mesh.subdivide_depth = size/lod_level
+		mesh.subdivide_width = (size/lod_level)-1
+		mesh.subdivide_depth = (size/lod_level)-1
 	
 	mesh_data_tool = create_datatool_from_mesh()
 	generate_collision_mesh()
@@ -94,18 +94,20 @@ func _process_chunk(delta, terrain_tool, aabb: AABB):
 
 	for body in bodies:
 		var vertex = body.get_translation()
+		var transformed_vertex = global_transform.xform(vertex)
 		var old_vertex = body.get_translation()
 		var i = body.get_meta("i")
-		
+#		print(transformed_vertex)
 		if !terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_FLATTEN:
-			vertex.y += terrain_tool.get_strength_at_position(vertex, false) * ((2.0 * int(!terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_DOWN)) - 1) * delta
+			vertex.y += terrain_tool.get_strength_at_position(transformed_vertex, false) * ((2.0 * int(!terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_DOWN)) - 1) * delta * 5
 #			print(vertex.y)
 		else:
 			if int(vertex.y) == 0:
 				vertex.y = lerp(vertex.y, 0, delta*5)
 			else:
-				vertex.y += terrain_tool.get_strength_at_position(vertex, false) * ((2.0 * int(vertex.y < 0)) - 1) * delta
-		vertex.y = clamp(vertex.y, -50, 100)
+				vertex.y += terrain_tool.get_strength_at_position(transformed_vertex, false) * ((2.0 * int(vertex.y < 0)) - 1) * delta * 5
+#		print(vertex.y)
+		vertex.y = clamp(vertex.y, -100, 100)
 		if vertex != old_vertex:
 #			print("vertex ", i, ": ", vertex, ": ", old_vertex.y, " -> ", vertex.y)
 			mesh_data_tool.set_vertex(i, vertex)
@@ -123,7 +125,7 @@ func create_mesh_from_datatool():
 	mesh_data_tool.commit_to_surface(array_mesh)
 	mesh = array_mesh
 	if collision_shape:
-		collision_shape.shape = mesh.create_trimesh_shape()
+		collision_shape.shape = mesh.create_convex_shape()
 
 
 func calculate_normals():

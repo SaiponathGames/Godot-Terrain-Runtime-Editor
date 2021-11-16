@@ -5,9 +5,9 @@
 [resource]
 shader = ExtResource( 1 )
 shader_param/radius = 3.0
-shader_param/attenuated_radius = 0.01
-shader_param/attenuation_strength = 1.164
-shader_param/attenuated_size_multiplier = 1.778
+shader_param/attenuated_radius = 0.0
+shader_param/attenuation_strength = 1.0
+shader_param/attenuated_size_multiplier = 1.0
 shader_param/max_power = 1.0
 shader_param/min_power = 0.0
 shader_param/color = Color( 0, 1, 1, 0.498039 )

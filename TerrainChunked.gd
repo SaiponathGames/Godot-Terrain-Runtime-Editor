@@ -31,7 +31,7 @@ static func previous_power_of_two(x: int) -> int:
 
 
 var _size: int = 64
-export var chunk_size = 16
+var _chunk_size: int = 16
 var chunks = {}
 var height_map: Image = Image.new()
 var quad_tree = QuadTreeNode.new()
@@ -45,6 +45,7 @@ func _ready():
 	if Engine.editor_hint:
 		return
 	quad_tree.extents = Vector3(_size/2, 2, _size/2)
+	$QuadTreeNode.extents = Vector3(_size/2, 2, _size/2)
 	quad_tree.capacity = 4
 	quad_tree.max_levels = 6
 	height_map.create(_size, _size, false, Image.FORMAT_RGBA8)
@@ -54,12 +55,12 @@ func _ready():
 	if get_node_or_null(terrain_tool_node):
 		terrain_tool = get_node(terrain_tool_node)
 #	print(range(-_size/2-8, 64-/2+8, 16))
-	var r = range((-_size+chunk_size)/2, (_size+chunk_size)/2, chunk_size)
-	# var r = range((-2*chunk_size+chunk_size)/2, (2*chunk_size+chunk_size)/2, chunk_size)
+	var r = range((-_size+_chunk_size)/2, (_size+_chunk_size)/2, _chunk_size)
+	# var r = range((-2*_chunk_size+_chunk_size)/2, (2*_chunk_size+_chunk_size)/2, _chunk_size)
 	for i in r:
 		for j in r:
 			var image_offset: Vector2 = Vector2(range_lerp(i, -_size/2, _size/2, 0, _size), range_lerp(j, -_size/2, _size/2, 0, _size))
-			var chunk = Chunk.new(Vector3(i, 0, j), chunk_size, 0, height_map, image_offset)
+			var chunk = Chunk.new(Vector3(i, 0, j), _chunk_size, 1, height_map, image_offset)
 			add_child(chunk)
 			chunks[Vector3(i, 0, j)] = chunk
 			chunk.translation = Vector3(i, 0, j)
@@ -108,8 +109,9 @@ func _process(delta):
 				var new_aabb = aabb
 				var old_aabb = (chunk.global_transform as Transform).xform_inv(new_aabb)
 				# print("chunk: ", chunk, " (", chunk.get_transformed_aabb(), "), aabb: ", aabb, ", new: ", new_aabb, ", old: ", old_aabb)
-				old_aabb.position.y -= 50
-				old_aabb.size.y += 100
+#				old_aabb.position.y -= 50
+#				old_aabb.size.y += 100
+#				print(old_aabb)
 				(chunk as Chunk)._process_chunk(delta, terrain_tool, old_aabb)
 				
 	terrain_tool.reset_values()
@@ -130,17 +132,27 @@ func _get_property_list():
 		"hint": PROPERTY_HINT_RANGE,
 		"hint_string": "16,8192"
 	})
+	properties.append({
+		"name": "chunk_size",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "8,64"
+	})
 	return properties
 
 func _get(property):
 	match property:
 		"size":
 			return _size
+		"chunk_size": 
+			return _chunk_size
 
 func _set(property, value):
 	match property:
 		"size":
 			_size = snap_to_nearest_power_of_two(_size, value)
-			
+			return true
+		"chunk_size":
+			_chunk_size = snap_to_nearest_power_of_two(_chunk_size, value)
 			return true
 

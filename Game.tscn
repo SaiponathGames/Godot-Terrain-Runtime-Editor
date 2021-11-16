@@ -13,9 +13,9 @@
 
 [sub_resource type="PlaneMesh" id=1]
 material = ExtResource( 5 )
-size = Vector2( 16, 16 )
-subdivide_width = 32
-subdivide_depth = 32
+size = Vector2( 8, 8 )
+subdivide_width = 16
+subdivide_depth = 16
 
 [sub_resource type="BoxShape" id=2]
 extents = Vector3( 8, 0.25, 8 )

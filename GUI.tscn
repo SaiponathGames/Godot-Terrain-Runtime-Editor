@@ -74,13 +74,14 @@ margin_bottom = 16.0
 size_flags_horizontal = 3
 max_value = 1.0
 step = 0.01
+value = 1.0
 
 [node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/Strength"]
 margin_left = 609.0
 margin_top = 1.0
 margin_right = 633.0
 margin_bottom = 15.0
-text = "000"
+text = "001"
 
 [node name="RotationDegrees" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
 margin_top = 52.0

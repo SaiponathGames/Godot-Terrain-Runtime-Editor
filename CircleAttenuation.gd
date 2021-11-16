@@ -39,10 +39,13 @@ func _update_attentuation_size():
 
 func get_power_at_position(position: Vector3, sharp = false) -> float:
 	var _translation = global_transform.origin
+#	prints(position, translation)
 	var _distance_squared = _translation.distance_squared_to(position)
 	if _distance_squared >= radius_squared:
+#		prints(position, _translation, "_distance_squared >= radius_squared")
 		return min_power
 	if _distance_squared <= attentuation_radius_squared:
+#		prints(position, "_distance_squared <= attentuation_radius_squared")
 		return max_power
 	
 	# thanks to JestemStefan and QbieShay

@@ -11,62 +11,16 @@
 [ext_resource path="res://Materials/Terrain.material" type="Material" id=9]
 [ext_resource path="res://GUI.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Materials/Drawing.material" type="Material" id=11]
+[ext_resource path="res://AttenuatedCircle.tres" type="Material" id=12]
+[ext_resource path="res://addons/sairam.quadtree/QuadTreeNode.gd" type="Script" id=13]
 
-[sub_resource type="Shader" id=4]
-code = "shader_type spatial;
-// by Sairam
-uniform float radius = 3.0;
-uniform float attenuated_radius = 0.01;
-uniform float attenuation_strength = 1.0;
-uniform float attenuated_size_multiplier = 1.0;
-uniform float max_power = 1;
-uniform float min_power = 0;
-
-uniform vec4 color : hint_color = vec4(0.0, 1.0, 1.0, 0.5);
-
-varying vec3 vertex_1;
-
-float get_power_at_position(vec3 point) {
-	vec3 origin = vec3(0.0, 0.0, 0.0);
-	float dist = pow(distance(origin, point), 2.0);
-	
-	if (dist >= radius*radius) {
-		return min_power;
-	}
-	if (dist <= attenuated_radius*attenuated_radius) {
-		return max_power;
-	}
-
-	float ratio = 1.0 - ((dist - attenuated_radius*attenuated_radius) / (radius*radius - attenuated_radius*attenuated_radius));
-	return mix(min_power, max_power, ratio) * attenuation_strength*attenuated_size_multiplier;
-}
-
-void vertex() {
-	vertex_1 = VERTEX;
-}
-
-void fragment() {
-	ALBEDO = color.xyz;
-	ALPHA = get_power_at_position(vertex_1) * color.a;
-}"
-
-[sub_resource type="ShaderMaterial" id=5]
-shader = SubResource( 4 )
-shader_param/radius = 3.0
-shader_param/attenuated_radius = 0.01
-shader_param/attenuation_strength = 1.164
-shader_param/attenuated_size_multiplier = 1.778
-shader_param/max_power = 1.0
-shader_param/min_power = 0.0
-shader_param/color = Color( 0, 1, 1, 0.498039 )
-
-[sub_resource type="CylinderMesh" id=6]
-material = SubResource( 5 )
+[sub_resource type="CylinderMesh" id=1]
+material = ExtResource( 12 )
 top_radius = 4.0
 bottom_radius = 4.0
 height = 0.01
 
-[sub_resource type="SpatialMaterial" id=7]
+[sub_resource type="SpatialMaterial" id=2]
 flags_unshaded = true
 params_line_width = 24.8
 albedo_color = Color( 0, 0, 0, 1 )
@@ -78,10 +32,13 @@ script = ExtResource( 8 )
 
 [node name="Terrain" type="Spatial" parent="."]
 script = ExtResource( 1 )
-chunk_size = 8
 terrain_tool_node = NodePath("../Tools/TerrainTool")
 terrain_material = ExtResource( 9 )
-size = 128
+size = 64
+chunk_size = 8
+
+[node name="QuadTreeNode" type="Spatial" parent="Terrain"]
+script = ExtResource( 13 )
 
 [node name="Camera" parent="." instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0 )
@@ -92,16 +49,15 @@ zooming/max_distance = 300.0
 [node name="Tools" type="Spatial" parent="."]
 
 [node name="TerrainTool" type="MeshInstance" parent="Tools"]
-mesh = SubResource( 6 )
+mesh = SubResource( 1 )
 material/0 = null
 script = ExtResource( 7 )
 
 [node name="AttenuatedCircle" type="Spatial" parent="Tools/TerrainTool"]
 script = ExtResource( 6 )
 radius = 3.0
-attentuation_radius = 0.01
-attentuation_size_multiplier = 0.5
-min_power = 0.01
+attentuation_radius = 0.0
+attentuation_size_multiplier = 1.0
 
 [node name="Raise" type="AudioStreamPlayer" parent="Tools/TerrainTool"]
 stream = ExtResource( 4 )
@@ -113,13 +69,11 @@ volume_db = -3.098
 
 [node name="ImmediateGeometry" type="ImmediateGeometry" parent="Tools"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )
-visible = false
 material_override = ExtResource( 11 )
 
 [node name="ImmediateGeometry2" type="ImmediateGeometry" parent="Tools"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )
-visible = false
-material_override = SubResource( 7 )
+material_override = SubResource( 2 )
 
 [node name="Control2" parent="." instance=ExtResource( 10 )]
 mouse_filter = 2

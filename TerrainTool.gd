@@ -25,6 +25,7 @@ func _unhandled_input(event):
 	if event is InputEventMouseMotion:
 		mouse_pointer = event.position
 		if Input.is_action_pressed("left_button") and (!event.control and !event.shift):
+#			print("is being clicked?")
 			clicked = true
 			strength = Input.get_action_strength("left_button") * strength_factor * 2
 			attenuated_circle.attentuation_strength = strength
@@ -32,20 +33,20 @@ func _unhandled_input(event):
 			if mesh is CylinderMesh:
 				radius = mesh.bottom_radius
 				attenuated_circle.radius = radius
-		elif event.control and Input.is_action_pressed("left_button"):
-			set_strength_value(strength_factor+event.relative.x*0.02)
-		elif event.shift and Input.is_action_pressed("left_button"):
-			print("shift")
-			set_radius_value(radius+event.relative.x*0.02)
+#		elif event.control and Input.is_action_pressed("left_button"):
+#			set_strength_value(strength_factor+event.relative.x*0.01)
+#		elif event.shift and Input.is_action_pressed("left_button"):
+##			print("shift")
+#			set_radius_value(radius+event.relative.x*0.02)
 			
-		
-	if Input.is_action_just_pressed("left_button"):
+
+	if Input.is_action_just_pressed("left_button") and !Input.is_key_pressed(KEY_SHIFT) and !Input.is_key_pressed(KEY_CONTROL):
 		position = translation
 		for audio in sound_dict.values():
 			audio.stop()
 		sound_dict[current_state].play()
 
-	if Input.is_action_just_released("left_button"):
+	if Input.is_action_just_released("left_button") and !Input.is_key_pressed(KEY_SHIFT) and !Input.is_key_pressed(KEY_CONTROL):
 		for audio in sound_dict.values():
 			audio.stop()
 		clicked = false
@@ -59,16 +60,20 @@ func _physics_process(_delta):
 		if not ray.empty():
 			show()
 			translation = ray.get("position", translation)
+#			print(translation)
 		else:
 			hide()
 	
-	if clicked and Input.is_action_pressed("left_button"):
+	if clicked and Input.is_action_pressed("left_button") and (!Input.is_key_pressed(KEY_CONTROL) and !Input.is_key_pressed(KEY_SHIFT)):
+#		print("running?")
 		strength = Input.get_action_strength("left_button") * strength_factor * 2
 		attenuated_circle.attentuation_strength = strength
+		mesh.surface_get_material(0).set_shader_param("attenuation_strength", strength_factor)
 		position = translation
 		if mesh is CylinderMesh:
 			radius = mesh.bottom_radius
 			attenuated_circle.radius = radius
+			mesh.surface_get_material(0).set_shader_param("radius", float(radius))
 
 func reset_values():
 	position = null
@@ -77,7 +82,8 @@ func set_state(state):
 	current_state = state
 
 func set_strength_value(value):
-	strength_factor = value
+	strength_factor = clamp(value, 0, 1)
+	mesh.surface_get_material(0).set_shader_param("attenuation_strength", strength_factor)
 
 func set_radius_value(value):
 	if mesh is CylinderMesh:
@@ -85,6 +91,7 @@ func set_radius_value(value):
 		mesh.top_radius = value
 		radius = value
 		attenuated_circle.radius = radius
+		mesh.surface_get_material(0).set_shader_param("radius", float(radius))
 
 func get_strength_at_position(_position, sharp_edges):
 	return attenuated_circle.get_power_at_position(_position, sharp_edges)
