@@ -18,7 +18,7 @@ var clicked = false
 onready var sound_dict = {
 	TerrainToolStates.SLOPE_UP: $Raise,
 	TerrainToolStates.SLOPE_DOWN: $Lower,
-	TerrainToolStates.SLOPE_FLATTEN: $Raise
+	TerrainToolStates.SLOPE_FLATTEN: $Flatten
 }
 
 func _unhandled_input(event):

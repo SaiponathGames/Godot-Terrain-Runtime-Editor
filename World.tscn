@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://TerrainChunked.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/Camera.tscn" type="PackedScene" id=2]
@@ -13,6 +13,7 @@
 [ext_resource path="res://Materials/Drawing.material" type="Material" id=11]
 [ext_resource path="res://AttenuatedCircle.tres" type="Material" id=12]
 [ext_resource path="res://addons/sairam.quadtree/QuadTreeNode.gd" type="Script" id=13]
+[ext_resource path="res://sounds/terraform_smooth.wav" type="AudioStream" id=14]
 
 [sub_resource type="CylinderMesh" id=1]
 material = ExtResource( 12 )
@@ -67,12 +68,40 @@ volume_db = -3.098
 stream = ExtResource( 5 )
 volume_db = -3.098
 
+[node name="Flatten" type="AudioStreamPlayer" parent="Tools/TerrainTool"]
+stream = ExtResource( 14 )
+volume_db = -3.098
+
+[node name="TerrainTool2" type="MeshInstance" parent="Tools"]
+mesh = SubResource( 1 )
+material/0 = null
+script = ExtResource( 7 )
+
+[node name="AttenuatedCircle" type="Spatial" parent="Tools/TerrainTool2"]
+script = ExtResource( 6 )
+radius = 3.0
+attentuation_radius = 0.0
+attentuation_size_multiplier = 1.0
+
+[node name="Raise" type="AudioStreamPlayer" parent="Tools/TerrainTool2"]
+stream = ExtResource( 4 )
+volume_db = -3.098
+
+[node name="Lower" type="AudioStreamPlayer" parent="Tools/TerrainTool2"]
+stream = ExtResource( 5 )
+volume_db = -3.098
+
+[node name="Flatten" type="AudioStreamPlayer" parent="Tools/TerrainTool2"]
+stream = ExtResource( 14 )
+volume_db = -3.098
+
 [node name="ImmediateGeometry" type="ImmediateGeometry" parent="Tools"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )
 material_override = ExtResource( 11 )
 
 [node name="ImmediateGeometry2" type="ImmediateGeometry" parent="Tools"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )
+visible = false
 material_override = SubResource( 2 )
 
 [node name="Control2" parent="." instance=ExtResource( 10 )]
