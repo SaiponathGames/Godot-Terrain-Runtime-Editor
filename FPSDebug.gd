@@ -10,3 +10,8 @@ func _process(_delta):
 #	aabb.position.y -= 50
 #	aabb.size.y += 100
 #	$Label.text += "Nearby Chunks + Current Chunk: %s" % [$"../Terrain".quad_tree.query(aabb)]
+
+func _input(event):
+	if event is InputEventKey:
+		if event.scancode == KEY_K and event.pressed:
+			OS.window_fullscreen = !OS.window_fullscreen

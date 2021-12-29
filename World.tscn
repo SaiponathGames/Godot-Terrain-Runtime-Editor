@@ -42,7 +42,6 @@ chunk_size = 8
 script = ExtResource( 13 )
 
 [node name="Camera" parent="." instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0 )
 far = 500.0
 tilting/max_angle = 90.0
 zooming/max_distance = 300.0
@@ -51,7 +50,6 @@ zooming/max_distance = 300.0
 
 [node name="TerrainTool" type="MeshInstance" parent="Tools"]
 mesh = SubResource( 1 )
-material/0 = null
 script = ExtResource( 7 )
 
 [node name="AttenuatedCircle" type="Spatial" parent="Tools/TerrainTool"]
@@ -69,29 +67,6 @@ stream = ExtResource( 5 )
 volume_db = -3.098
 
 [node name="Flatten" type="AudioStreamPlayer" parent="Tools/TerrainTool"]
-stream = ExtResource( 14 )
-volume_db = -3.098
-
-[node name="TerrainTool2" type="MeshInstance" parent="Tools"]
-mesh = SubResource( 1 )
-material/0 = null
-script = ExtResource( 7 )
-
-[node name="AttenuatedCircle" type="Spatial" parent="Tools/TerrainTool2"]
-script = ExtResource( 6 )
-radius = 3.0
-attentuation_radius = 0.0
-attentuation_size_multiplier = 1.0
-
-[node name="Raise" type="AudioStreamPlayer" parent="Tools/TerrainTool2"]
-stream = ExtResource( 4 )
-volume_db = -3.098
-
-[node name="Lower" type="AudioStreamPlayer" parent="Tools/TerrainTool2"]
-stream = ExtResource( 5 )
-volume_db = -3.098
-
-[node name="Flatten" type="AudioStreamPlayer" parent="Tools/TerrainTool2"]
 stream = ExtResource( 14 )
 volume_db = -3.098
 

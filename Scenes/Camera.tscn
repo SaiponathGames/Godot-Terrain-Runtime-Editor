@@ -35,11 +35,6 @@ mouse/sensitivity = 0.03
 option/disable_edge_scrolling_when_using_mouse = true
 option/target_zoom = true
 option/zoom_to_cursor = false
-option/invert/zooming = null
-option/invert/panning = null
-option/invert/rotation = null
-option/invert/rotation_keys = null
-option/invert/tilting = null
 limits/enabled = true
 limits/rect = Rect2( -2450, -2450, 4900, 4900 )
 
