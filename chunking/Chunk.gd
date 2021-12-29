@@ -62,6 +62,7 @@ func generate_mesh():
 		mesh.subdivide_depth = (size/lod_level)-1
 	
 	mesh_data_tool = create_datatool_from_mesh()
+	print(mesh_data_tool.get_vertex_count())
 	generate_collision_mesh()
 
 	setup_quadtree()

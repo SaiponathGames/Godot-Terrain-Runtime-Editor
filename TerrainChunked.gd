@@ -39,6 +39,8 @@ var quad_tree = QuadTreeNode.new()
 export(NodePath) var terrain_tool_node
 var terrain_tool
 
+export(int) var lod_lvl = 0
+
 export(Material) var terrain_material = SpatialMaterial.new()
 
 func _ready():
@@ -60,13 +62,14 @@ func _ready():
 	for i in r:
 		for j in r:
 			var image_offset: Vector2 = Vector2(range_lerp(i, -_size/2, _size/2, 0, _size), range_lerp(j, -_size/2, _size/2, 0, _size))
-			var chunk = Chunk.new(Vector3(i, 0, j), _chunk_size, 1, height_map, image_offset)
+			var chunk = Chunk.new(Vector3(i, 0, j), _chunk_size, lod_lvl, height_map, image_offset)
 			add_child(chunk)
 			chunks[Vector3(i, 0, j)] = chunk
 			chunk.translation = Vector3(i, 0, j)
 			chunk.generate_mesh()
 			chunk.material_override = terrain_material
 			quad_tree.add_body(chunk)
+	_draw_chunks()
 
 func _draw_lines(aabb, immediate_geometry):
 	for i in range(12):

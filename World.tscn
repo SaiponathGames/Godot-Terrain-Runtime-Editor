@@ -35,8 +35,8 @@ script = ExtResource( 8 )
 script = ExtResource( 1 )
 terrain_tool_node = NodePath("../Tools/TerrainTool")
 terrain_material = ExtResource( 9 )
-size = 64
-chunk_size = 8
+size = 256
+chunk_size = 64
 
 [node name="QuadTreeNode" type="Spatial" parent="Terrain"]
 script = ExtResource( 13 )
@@ -76,7 +76,6 @@ material_override = ExtResource( 11 )
 
 [node name="ImmediateGeometry2" type="ImmediateGeometry" parent="Tools"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )
-visible = false
 material_override = SubResource( 2 )
 
 [node name="Control2" parent="." instance=ExtResource( 10 )]
