@@ -47,9 +47,9 @@ func _ready():
 	if Engine.editor_hint:
 		return
 	quad_tree.extents = Vector3(_size/2, 2, _size/2)
-	$QuadTreeNode.extents = Vector3(_size/2, 2, _size/2)
 	quad_tree.capacity = 4
 	quad_tree.max_levels = 6
+	quad_tree.name = "QuadTreeNode"
 	height_map.create(_size, _size, false, Image.FORMAT_RGBA8)
 	quad_tree.immediate_geo_node_path =  "/root/World/Tools/ImmediateGeometry"
 	add_child(quad_tree)
@@ -65,6 +65,7 @@ func _ready():
 			var chunk = Chunk.new(Vector3(i, 0, j), _chunk_size, lod_lvl, height_map, image_offset)
 			add_child(chunk)
 			chunks[Vector3(i, 0, j)] = chunk
+			chunk.name = "Chunk %d %d" % [i, j]
 			chunk.translation = Vector3(i, 0, j)
 			chunk.generate_mesh()
 			chunk.material_override = terrain_material
@@ -119,12 +120,15 @@ func _process(delta):
 				
 	terrain_tool.reset_values()
 #	quad_tree.draw(0)
-	_draw_chunks()
+#	_draw_chunks()
 			
 func _unhandled_key_input(event):
+	var immediate_geometry = $"../Tools/ImmediateGeometry2"
 	if event.scancode == KEY_L:
 		quad_tree.dump("cool.txt")
 		OS.shell_open(ProjectSettings.globalize_path("user://dumps"))
+	if Input.is_key_pressed(KEY_F3) and Input.is_key_pressed(KEY_G):
+		immediate_geometry.visible = !immediate_geometry.visible
 			
 
 func _get_property_list():

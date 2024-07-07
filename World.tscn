@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://TerrainChunked.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/Camera.tscn" type="PackedScene" id=2]
@@ -12,7 +12,6 @@
 [ext_resource path="res://GUI.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Materials/Drawing.material" type="Material" id=11]
 [ext_resource path="res://AttenuatedCircle.tres" type="Material" id=12]
-[ext_resource path="res://addons/sairam.quadtree/QuadTreeNode.gd" type="Script" id=13]
 [ext_resource path="res://sounds/terraform_smooth.wav" type="AudioStream" id=14]
 
 [sub_resource type="CylinderMesh" id=1]
@@ -35,16 +34,18 @@ script = ExtResource( 8 )
 script = ExtResource( 1 )
 terrain_tool_node = NodePath("../Tools/TerrainTool")
 terrain_material = ExtResource( 9 )
-size = 256
-chunk_size = 64
-
-[node name="QuadTreeNode" type="Spatial" parent="Terrain"]
-script = ExtResource( 13 )
+size = 128
+chunk_size = 16
 
 [node name="Camera" parent="." instance=ExtResource( 2 )]
 far = 500.0
 tilting/max_angle = 90.0
 zooming/max_distance = 300.0
+option/invert/zooming = null
+option/invert/panning = null
+option/invert/rotation = null
+option/invert/rotation_keys = null
+option/invert/tilting = null
 
 [node name="Tools" type="Spatial" parent="."]
 
@@ -72,10 +73,12 @@ volume_db = -3.098
 
 [node name="ImmediateGeometry" type="ImmediateGeometry" parent="Tools"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )
+visible = false
 material_override = ExtResource( 11 )
 
 [node name="ImmediateGeometry2" type="ImmediateGeometry" parent="Tools"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0 )
+visible = false
 material_override = SubResource( 2 )
 
 [node name="Control2" parent="." instance=ExtResource( 10 )]
@@ -125,16 +128,21 @@ margin_right = 440.0
 margin_bottom = 134.0
 
 [node name="Button" parent="Control2/PanelContainer/VBoxContainer/HBoxContainer4" index="0"]
-margin_right = 131.0
+margin_right = 92.0
 margin_bottom = 56.0
 
 [node name="Button2" parent="Control2/PanelContainer/VBoxContainer/HBoxContainer4" index="1"]
-margin_left = 154.0
-margin_right = 285.0
+margin_left = 115.0
+margin_right = 207.0
 margin_bottom = 56.0
 
 [node name="Button3" parent="Control2/PanelContainer/VBoxContainer/HBoxContainer4" index="2"]
-margin_left = 308.0
+margin_left = 230.0
+margin_right = 325.0
+margin_bottom = 56.0
+
+[node name="Button4" parent="Control2/PanelContainer/VBoxContainer/HBoxContainer4" index="3"]
+margin_left = 348.0
 margin_right = 440.0
 margin_bottom = 56.0
 

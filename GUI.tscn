@@ -117,24 +117,31 @@ custom_constants/separation = 23
 alignment = 1
 
 [node name="Button" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer4"]
-margin_right = 195.0
+margin_right = 141.0
 margin_bottom = 119.0
 size_flags_horizontal = 3
 text = "Slope Up"
 
 [node name="Button2" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer4"]
-margin_left = 218.0
-margin_right = 414.0
+margin_left = 164.0
+margin_right = 305.0
 margin_bottom = 119.0
 size_flags_horizontal = 3
 text = "Slope Down"
 
 [node name="Button3" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer4"]
-margin_left = 437.0
-margin_right = 633.0
+margin_left = 328.0
+margin_right = 469.0
 margin_bottom = 119.0
 size_flags_horizontal = 3
 text = "Slope Flatten"
+
+[node name="Button4" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer4"]
+margin_left = 492.0
+margin_right = 633.0
+margin_bottom = 119.0
+size_flags_horizontal = 3
+text = "Slope Level"
 
 [connection signal="value_changed" from="PanelContainer/VBoxContainer/Radius/Radius" to="PanelContainer" method="_on_HSlider_value_changed"]
 [connection signal="value_changed" from="PanelContainer/VBoxContainer/Strength/Strength" to="PanelContainer" method="_on_Strength_value_changed"]
@@ -142,3 +149,4 @@ text = "Slope Flatten"
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer4/Button" to="PanelContainer" method="_on_Button_pressed" binds= [ 0 ]]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer4/Button2" to="PanelContainer" method="_on_Button_pressed" binds= [ 1 ]]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer4/Button3" to="PanelContainer" method="_on_Button_pressed" binds= [ 2 ]]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer4/Button4" to="PanelContainer" method="_on_Button_pressed" binds= [ 3 ]]

@@ -62,7 +62,6 @@ func generate_mesh():
 		mesh.subdivide_depth = (size/lod_level)-1
 	
 	mesh_data_tool = create_datatool_from_mesh()
-	print(mesh_data_tool.get_vertex_count())
 	generate_collision_mesh()
 
 	setup_quadtree()
@@ -93,30 +92,34 @@ func _process_chunk(delta, terrain_tool, aabb: AABB):
 	var bodies = quad_tree.query(aabb.grow(0.05))
 	# print("chunk: ", self, "aabb:", aabb, " -> ", bodies.size())
 
+	var faces_changed = []
 	for body in bodies:
+		var level_y = terrain_tool.level_y if terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_LEVEL else 0
 		var vertex = body.get_translation()
 		var transformed_vertex = global_transform.xform(vertex)
 		var old_vertex = body.get_translation()
 		var i = body.get_meta("i")
 #		print(transformed_vertex)
-		if !terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_FLATTEN:
-			vertex.y += terrain_tool.get_strength_at_position(transformed_vertex, false) * ((2.0 * int(!terrain_tool.current_state == terrain_tool.TerrainToolStates.SLOPE_DOWN)) - 1) * delta * 5
+		if not terrain_tool.current_state in [terrain_tool.TerrainToolStates.SLOPE_FLATTEN, terrain_tool.TerrainToolStates.SLOPE_LEVEL]:
+			vertex.y += terrain_tool.get_strength_at_position(transformed_vertex, false) * ((2.0 * int(terrain_tool.current_state != terrain_tool.TerrainToolStates.SLOPE_DOWN)) - 1) * delta * 5
 #			print(vertex.y)
-		else:
-			if int(vertex.y) == 0:
-				vertex.y = lerp(vertex.y, 0, delta*5)
+		else:	
+			# Is flat?
+			if is_equal_approx(vertex.y, level_y):
+				vertex.y = lerp(vertex.y, level_y, delta)
 			else:
-				vertex.y += terrain_tool.get_strength_at_position(transformed_vertex, false) * ((2.0 * int(vertex.y < 0)) - 1) * delta * 5
+				vertex.y += terrain_tool.get_strength_at_position(transformed_vertex, false) * ((2.0 * int(vertex.y < level_y)) - 1) * delta * 5
 #		print(vertex.y)
 		vertex.y = clamp(vertex.y, -100, 100)
-		if vertex != old_vertex:
+		if !vertex.is_equal_approx(old_vertex):
 #			print("vertex ", i, ": ", vertex, ": ", old_vertex.y, " -> ", vertex.y)
 			mesh_data_tool.set_vertex(i, vertex)
+			faces_changed.append_array(mesh_data_tool.get_vertex_faces(i))
 			body.set_translation(vertex)
 			quad_tree.update_body(body, _get_common_bounds(vertex))
 			mesh_changed = true
 	if mesh_changed:
-		calculate_normals()
+		calculate_normals(faces_changed)
 		create_mesh_from_datatool()
 		mesh_changed = false
 
@@ -128,30 +131,36 @@ func create_mesh_from_datatool():
 	if collision_shape:
 		collision_shape.shape = mesh.create_convex_shape()
 
+func calculate_normals(faces_changed: Array):
+	if faces_changed.empty():
+		for i in range(mesh_data_tool.get_face_count()):
+			calculate_normal(i, mesh_data_tool)
+	else:
+		for i in faces_changed:
+			calculate_normal(i, mesh_data_tool)
 
-func calculate_normals():
-	for i in range(mesh_data_tool.get_face_count()):
-		# Get the index in the vertex array.
-		var a = mesh_data_tool.get_face_vertex(i, 0)
-		var b = mesh_data_tool.get_face_vertex(i, 1)
-		var c = mesh_data_tool.get_face_vertex(i, 2)
-		# Get vertex position using vertex index.
-		var ap = mesh_data_tool.get_vertex(a)
-		var bp = mesh_data_tool.get_vertex(b)
-		var cp = mesh_data_tool.get_vertex(c)
-		# Calculate face normal.
-		var n = (bp - cp).cross(ap - bp).normalized()
-		var an = (n + mesh_data_tool.get_vertex_normal(a)).normalized()
-		var bn = (n + mesh_data_tool.get_vertex_normal(b)).normalized()
-		var cn = (n + mesh_data_tool.get_vertex_normal(c)).normalized()
-		# Add face normal to current vertex normal.
-		# This will not result in perfect normals, but it will be close.
-		mesh_data_tool.set_vertex_normal(a, an)
-		mesh_data_tool.set_vertex_color(a, Color(an.x, an.y, an.z))
-		mesh_data_tool.set_vertex_normal(b, bn)
-		mesh_data_tool.set_vertex_color(b, Color(bn.x, bn.y, bn.z))
-		mesh_data_tool.set_vertex_normal(c, cn)
-		mesh_data_tool.set_vertex_color(c, Color(cn.x, cn.y, cn.z))
+# GODOT DOCS
+static func calculate_normal(face, mesh_data_tool):
+	var a = mesh_data_tool.get_face_vertex(face, 0)
+	var b = mesh_data_tool.get_face_vertex(face, 1)
+	var c = mesh_data_tool.get_face_vertex(face, 2)
+	# Get vertex position using vertex index.
+	var ap = mesh_data_tool.get_vertex(a)
+	var bp = mesh_data_tool.get_vertex(b)
+	var cp = mesh_data_tool.get_vertex(c)
+	# Calculate face normal.
+	var n = (bp - cp).cross(ap - bp).normalized()
+	var an = (n + mesh_data_tool.get_vertex_normal(a)).normalized()
+	var bn = (n + mesh_data_tool.get_vertex_normal(b)).normalized()
+	var cn = (n + mesh_data_tool.get_vertex_normal(c)).normalized()
+	# Add face normal to current vertex normal.
+	# This will not result in perfect normals, but it will be close.
+	mesh_data_tool.set_vertex_normal(a, an)
+	mesh_data_tool.set_vertex_color(a, Color(an.x, an.y, an.z))
+	mesh_data_tool.set_vertex_normal(b, bn)
+	mesh_data_tool.set_vertex_color(b, Color(bn.x, bn.y, bn.z))
+	mesh_data_tool.set_vertex_normal(c, cn)
+	mesh_data_tool.set_vertex_color(c, Color(cn.x, cn.y, cn.z))
 
 func generate_collision_mesh():
 	var static_body = StaticBody.new()

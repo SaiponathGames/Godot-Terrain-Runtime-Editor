@@ -9,9 +9,9 @@ var strength = 1
 var radius = 3
 
 func _ready():
-	$VBoxContainer/Radius/Label2.text = "%04d" % $VBoxContainer/Radius/Radius.value
+	$VBoxContainer/Radius/Label2.text = "%03d" % $VBoxContainer/Radius/Radius.value
 	$VBoxContainer/Strength/Label2.text = "%.2f" % $VBoxContainer/Strength/Strength.value
-	$VBoxContainer/RotationDegrees/Label2.text = "%04d" % $VBoxContainer/RotationDegrees/RotationDegrees.value
+	$VBoxContainer/RotationDegrees/Label2.text = "%03d" % $VBoxContainer/RotationDegrees/RotationDegrees.value
 
 func _on_Button_pressed(state):
 	emit_signal("state_changed", state)
@@ -38,5 +38,5 @@ func _unhandled_input(event):
 			$VBoxContainer/Radius/Radius.value = radius+event.relative.x*0.5
 			get_tree().set_input_as_handled()
 		elif event.control and Input.is_action_pressed("left_button"):
-			$VBoxContainer/Strength/Strength.value = strength+event.relative.x*0.01
+			$VBoxContainer/Strength/Strength.value = strength+event.relative.x*-0.01
 			get_tree().set_input_as_handled()

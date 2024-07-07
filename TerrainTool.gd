@@ -4,12 +4,14 @@ var position
 var strength = 1
 var radius = 3 setget set_radius_value
 
+var level_y = 0
+
 var mouse_pointer: Vector2 = Vector2()
 export(int) var strength_factor = 1 setget set_strength_value
 
 onready var attenuated_circle = $AttenuatedCircle
 
-enum TerrainToolStates {SLOPE_UP, SLOPE_DOWN, SLOPE_FLATTEN}
+enum TerrainToolStates {SLOPE_UP, SLOPE_DOWN, SLOPE_FLATTEN, SLOPE_LEVEL}
 
 var current_state = TerrainToolStates.SLOPE_UP
 
@@ -18,7 +20,8 @@ var clicked = false
 onready var sound_dict = {
 	TerrainToolStates.SLOPE_UP: $Raise,
 	TerrainToolStates.SLOPE_DOWN: $Lower,
-	TerrainToolStates.SLOPE_FLATTEN: $Flatten
+	TerrainToolStates.SLOPE_FLATTEN: $Flatten,
+	TerrainToolStates.SLOPE_LEVEL: $Raise,
 }
 
 func _unhandled_input(event):
@@ -63,6 +66,9 @@ func _physics_process(_delta):
 #			print(translation)
 		else:
 			hide()
+	if Input.is_action_just_released("right_button") and current_state == TerrainToolStates.SLOPE_LEVEL:
+		level_y = translation.y
+		
 	
 	if clicked and Input.is_action_pressed("left_button") and (!Input.is_key_pressed(KEY_CONTROL) and !Input.is_key_pressed(KEY_SHIFT)):
 #		print("running?")
@@ -106,4 +112,5 @@ func _on_PanelContainer_radius_changed(_radius):
 	set_radius_value(_radius)
 
 func _on_PanelContainer_rotation_changed(rotation):
-	pass # Replace with function body.
+	# Brush rotation (dont care for now)
+	pass
